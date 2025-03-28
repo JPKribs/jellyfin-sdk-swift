@@ -5,16 +5,15 @@
 //
 // Copyright (c) 2024 Jellyfin & Jellyfin Contributors
 //
-
 //
-// jellyfin-sdk-swift is subject to the terms of the Mozilla Public
+
+public enum AnyJSON: Hashable, Codable {
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, you can obtain one at https://mozilla.org/MPL/2.0/.
 //
 // Copyright (c) 2023 Jellyfin & Jellyfin Contributors
 //
 import Foundation
-
 public enum AnyJSON: Hashable, Codable {
     case string(String)
     case number(Double)
@@ -30,7 +29,6 @@ public enum AnyJSON: Hashable, Codable {
         case let .bool(bool): bool
         }
     }
-
     public func encode(to encoder: Encoder) throws {
         var container = encoder.singleValueContainer()
         switch self {
@@ -41,7 +39,6 @@ public enum AnyJSON: Hashable, Codable {
         case let .bool(bool): try container.encode(bool)
         }
     }
-
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         if let object = try? container.decode([String: AnyJSON].self) {
