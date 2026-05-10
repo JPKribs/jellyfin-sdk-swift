@@ -16,10 +16,31 @@ struct JellyfinTools: AsyncParsableCommand {
         commandName: "tools",
         abstract: "Tools for testing JellyfinAPI features",
         subcommands: [
+            Discover.self,
             QuickConnect.self,
             SignIn.self,
         ]
     )
+}
+
+struct Discover: AsyncParsableCommand {
+    static let configuration = CommandConfiguration(
+        commandName: "discover",
+        abstract: "Discover Jellyfin servers on the local network"
+    )
+
+    @Option(help: "Discovery duration in seconds")
+    var duration: Double = 5
+
+    func run() async throws {
+        guard duration > 0 else {
+            throw ValidationError("Duration must be greater than 0")
+        }
+
+        for try await response in JellyfinClient.discover(duration: .seconds(duration)) {
+            print("\(response.name) - \(response.id) - \(response.url.absoluteString)")
+        }
+    }
 }
 
 struct QuickConnect: AsyncParsableCommand {
