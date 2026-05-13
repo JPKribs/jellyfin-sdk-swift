@@ -1,5 +1,5 @@
 {
-  "originHash" : "1f0f1fa7a0215fdc96e9972cac64348650c73566802d3f9a4e4d9482757a69ce",
+  "originHash" : "f9ad287ba4eb1d2752115fe852682ee85fed690413530431de97deceb5fe4313",
   "pins" : [
     {
       "identity" : "get",
@@ -53,15 +53,6 @@
       "state" : {
         "revision" : "a34201439c74b53f0fd71ef11741af7e7caf01e1",
         "version" : "1.4.2"
-      }
-    },
-    {
-      "identity" : "urlqueryencoder",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/CreateAPI/URLQueryEncoder",
-      "state" : {
-        "revision" : "4cc975d4d075d0e62699a796a08284e217d4ee93",
-        "version" : "0.2.0"
       }
     }
   ],

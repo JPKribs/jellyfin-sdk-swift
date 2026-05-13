@@ -170,12 +170,26 @@ public final class JellyfinClient: @unchecked Sendable {
 public extension JellyfinClient {
 
     enum ClientError: Error {
-        case noAccessTokenInResponse
+        case noAccessToken
     }
 
     /// Quick Connect authorization helper.
     var quickConnect: QuickConnect {
         .init(client: self)
+    }
+
+    /// WebSocket helper.
+    func socket(
+        supportsMediaControl: Bool = false,
+        supportedCommands: [GeneralCommandType] = GeneralCommandType.allCases,
+        playableMediaTypes: [MediaType] = []
+    ) -> JellyfinSocket {
+        JellyfinSocket(
+            client: self,
+            supportsMediaControl: supportsMediaControl,
+            supportedCommands: supportedCommands,
+            playableMediaTypes: playableMediaTypes
+        )
     }
 
     /// Signs in a user given a username and password. On a successful response `accessToken` is set to the given access token.
@@ -196,7 +210,7 @@ public extension JellyfinClient {
         if let accessToken = response.accessToken {
             self.configuration.accessToken = accessToken
         } else {
-            throw ClientError.noAccessTokenInResponse
+            throw ClientError.noAccessToken
         }
 
         return response
@@ -219,7 +233,7 @@ public extension JellyfinClient {
         if let accessToken = response.accessToken {
             self.configuration.accessToken = accessToken
         } else {
-            throw ClientError.noAccessTokenInResponse
+            throw ClientError.noAccessToken
         }
 
         return response
@@ -255,5 +269,29 @@ public extension JellyfinClient {
     /// Creates a URL against the current server with the given path.
     func url(path: String) -> URL {
         configuration.url.appending(path: path.trimmingPrefix(while: { $0 == "/" }))
+    }
+
+    /// The URL used for web socket connections.
+    ///
+    /// - Throws: `ClientError.noAccessToken` if there is no current access token
+    var socketURL: URL {
+        get throws {
+            guard let accessToken else { throw ClientError.noAccessToken }
+
+            var components = URLComponents(url: configuration.url, resolvingAgainstBaseURL: false)!
+
+            components.scheme = components.scheme == "https" ? "wss" : "ws"
+
+            var basePath = components.path
+            while basePath.hasSuffix("/") { basePath.removeLast() }
+            components.path = basePath + "/socket"
+
+            components.queryItems = [
+                URLQueryItem(name: "api_key", value: accessToken),
+                URLQueryItem(name: "deviceId", value: configuration.deviceID),
+            ]
+
+            return components.url!
+        }
     }
 }

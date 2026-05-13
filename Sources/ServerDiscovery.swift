@@ -12,13 +12,13 @@ import NIOPosix
 
 public extension JellyfinClient {
 
-    enum ServerDiscoveryError: Error, Equatable, Sendable {
+    enum ServerDiscoveryError: Error, Sendable {
         case noUsableNetworkInterface
         case noUsableChannel
     }
 
     /// A response from UDP Jellyfin server discovery.
-    struct PublicServer: Codable, Identifiable, Sendable {
+    struct PublicServer: Codable, Hashable, Identifiable, Sendable {
 
         /// The server's ID.
         public let id: String

@@ -26,6 +26,45 @@ let response = jellyfinClient.signIn(username: "jelly", password: "fin")
 
 Alternatively, you can use your own network stack with the generated **Entities** and **Paths**.
 
+## WebSocket
+
+`JellyfinSocket` opens a long-lived WebSocket session to the Jellyfin server, delivering real-time updates as a stream of events. Subscriptions can be added or removed imperatively at any time and are restored automatically across reconnects.
+
+```swift
+/// Open a session
+let session = client.socket(
+    supportsMediaControl: true,
+    supportedCommands: [.displayMessage, .play, .pause]
+).connect()
+
+/// Subscribe to feeds (uses each subscription's default timing)
+session.subscribe(.sessions)
+session.subscribe(.activityLog, interval: .seconds(10))
+
+/// Iterate events for the lifetime of the session
+for try await event in session.events {
+    switch event {
+    case .connecting:
+        print("Connecting...")
+    case let .connected(url):
+        print("Connected to \(url)")
+    case let .message(message):
+        switch message {
+        case let .sessionsMessage(msg):
+            print("Sessions: \(msg)")
+        default:
+            break
+        }
+    }
+}
+
+/// Remove a subscription
+session.unsubscribe(.activityLog)
+
+/// Close the session (also triggered on `deinit`)
+session.disconnect()
+```
+
 ## Quick Connect
 
 `JellyfinClient` provides a Quick Connect authorization flow.
